@@ -24,7 +24,18 @@ fn = st.file_uploader("Upload your Canvas .CSV file", type=["csv"], accept_multi
 st.subheader("Upload your ARS XLSX file")
 ars_fn = st.file_uploader("Upload your ARS .XLSX file", type=["xlsx"], accept_multiple_files=False, label_visibility="collapsed")
 
-if fn and ars_fn:
+warning_placeholder = st.empty()
+
+if not fn and not ars_fn:
+    warning_placeholder.empty()
+    warning_placeholder.warning("Please upload both your Canvas and ARS files above.")
+elif not ars_fn:
+    warning_placeholder.empty()
+    warning_placeholder.warning("Please upload your ARS file above.")
+elif not fn:
+    warning_placeholder.empty()
+    warning_placeholder.warning("Please upload your Canvas file above.")
+else:
     grades_df = pd.read_csv(fn, encoding='latin1')
     ars_df = pd.read_excel(ars_fn)
 
@@ -172,6 +183,7 @@ if fn and ars_fn:
 
     with open("grade_sheets/all_calc_printsheet.xlsx", "rb") as file:
         st.markdown("### Download Formatted Printer Spreadsheet below")
+        st.info("Your spreadsheet is ready! Please click the download button below.")
         st.download_button(
             label="Download Formatted Printer Spreadsheet",
             data=file,
