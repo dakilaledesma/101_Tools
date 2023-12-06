@@ -50,6 +50,9 @@ if canvas_grade_file is not None:
         d_cutoff = st.number_input("D cutoff", value=82.5)
         f_cutoff = st.number_input("F cutoff", value=0.0)
 
+    with graph_col:
+        graph_container = st.empty()
+        graph_container.info("Loading the graph...")
 
     def count_students(df, grade_ranges):
         counts = {}
@@ -112,6 +115,7 @@ if canvas_grade_file is not None:
         axs[row, col].axis('off')
 
     with graph_col:
-        st.pyplot(fig)
+        graph_container.empty()
+        graph_container.pyplot(fig)
 
 
