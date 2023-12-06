@@ -6,6 +6,7 @@ from openpyxl.utils.cell import get_column_letter
 import streamlit as st
 
 st.set_page_config(layout="wide")
+st.title("101L Sheet Printer")
 
 if os.path.isdir("grade_sheets"):
     shutil.rmtree("grade_sheets")
