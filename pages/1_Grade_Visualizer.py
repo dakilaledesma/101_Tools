@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide",
+                   page_title="101L Tools - Grade Visualizer")
 
 st.title("101L Grade Visualizer")
 st.subheader("Upload your Canvas CSV file below.")
@@ -36,7 +37,7 @@ if canvas_grade_file is not None:
 
     sections = canvas_grade_df["Section"].unique()
 
-    cutoffs_col, graph_col = st.columns([0.3, 0.7])
+    cutoffs_col, graph_col = st.columns([0.2, 0.8])
 
     with cutoffs_col:
         a_cutoff = st.number_input("A cutoff", value=136.0)
@@ -50,10 +51,6 @@ if canvas_grade_file is not None:
         d_plus_cutoff = st.number_input("D+ cutoff", value=96.0)
         d_cutoff = st.number_input("D cutoff", value=82.5)
         f_cutoff = st.number_input("F cutoff", value=0.0)
-
-    with graph_col:
-        graph_container = st.empty()
-        graph_container.info("Loading the graph...")
 
     def count_students(df, grade_ranges):
         counts = {}
@@ -116,7 +113,9 @@ if canvas_grade_file is not None:
         axs[row, col].axis('off')
 
     with graph_col:
-        graph_container.empty()
-        graph_container.pyplot(fig)
+        loading_container = st.empty()
+        loading_container.info("*Loading graph, please wait...*")
+        st.pyplot(fig)
+        loading_container.empty()
 
 

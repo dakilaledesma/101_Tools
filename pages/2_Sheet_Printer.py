@@ -5,7 +5,9 @@ import numpy as np
 from openpyxl.utils.cell import get_column_letter
 import streamlit as st
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide",
+                   page_title="101L Tools - Sheet Printer")
+
 st.title("101L Sheet Printer")
 
 if os.path.isdir("grade_sheets"):
