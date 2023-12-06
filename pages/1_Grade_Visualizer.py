@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 st.set_page_config(layout="wide")
 
 st.title("101L Grade Visualizer")
-canvas_grade_file = st.file_uploader("Upload your Canvas CSV file", type=["csv"], accept_multiple_files=False)
+st.subheader("Upload your Canvas CSV file below.")
+canvas_grade_file = st.file_uploader("Upload your Canvas CSV file", type=["csv"], accept_multiple_files=False, label_visibility="collapsed")
 if canvas_grade_file is not None:
     canvas_df = pd.read_csv(canvas_grade_file)
 

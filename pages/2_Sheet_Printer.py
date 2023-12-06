@@ -15,8 +15,11 @@ if os.path.exists("grade_sheets.zip"):
 
 os.makedirs("grade_sheets")
 
-fn = st.file_uploader("Upload your Canvas CSV file", type=["csv"], accept_multiple_files=False)
-ars_fn = st.file_uploader("Upload your ARS XLSX file", type=["xlsx"], accept_multiple_files=False)
+st.subheader("Upload your Canvas CSV file")
+fn = st.file_uploader("Upload your Canvas .CSV file", type=["csv"], accept_multiple_files=False, label_visibility="collapsed")
+
+st.subheader("Upload your ARS XLSX file")
+ars_fn = st.file_uploader("Upload your ARS .XLSX file", type=["xlsx"], accept_multiple_files=False, label_visibility="collapsed")
 
 if fn and ars_fn:
     grades_df = pd.read_csv(fn, encoding='latin1')
@@ -163,9 +166,11 @@ if fn and ars_fn:
             writer.sheets[section].fit_to_pages(1, 1)
 
     workbook.close()
+
     with open("grade_sheets/all_calc_printsheet.xlsx", "rb") as file:
+        st.markdown("### Download Formatted Printer Spreadsheet below")
         st.download_button(
-            label="Download Calculated Grades",
+            label="Download Formatted Printer Spreadsheet",
             data=file,
             file_name='all_calc_spreadsheet.xlsx',
             mime='text/csv',
