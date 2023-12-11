@@ -25,7 +25,7 @@ st.subheader("Upload your ARS XLSX file")
 ars_fn = st.file_uploader("Upload your ARS .XLSX file", type=["xlsx"], accept_multiple_files=False, label_visibility="collapsed")
 
 st.subheader("Options")
-ars_to_normal_override = st.checkbox("Override ARS grades to the normal if ARS quiz grade column is higher than normal grade column, or if the normal grade column is blank.", value=True)
+ars_to_blank = st.checkbox("Override ARS grades to the normal grade column if the normal grade column is blank.", value=True)
 
 warning_placeholder = st.empty()
 
@@ -89,7 +89,7 @@ else:
     for idx, row in sums_df.iterrows():
         row_keys = list(row.keys())
 
-        if idx in ars_idx or ars_to_normal_override:
+        if idx in ars_idx or ars_to_blank:
             for ars_index in ars_indices:
                 if str(row[row_keys[ars_index - 1]]).lower().strip() in ['', "nan",]:
                     row[row_keys[ars_index - 1]] = 0
