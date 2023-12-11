@@ -24,6 +24,9 @@ fn = st.file_uploader("Upload your Canvas .CSV file", type=["csv"], accept_multi
 st.subheader("Upload your ARS XLSX file")
 ars_fn = st.file_uploader("Upload your ARS .XLSX file", type=["xlsx"], accept_multiple_files=False, label_visibility="collapsed")
 
+st.subheader("Options")
+ars_to_normal_override = st.checkbox("Override ARS grades to the normal if ARS quiz grade column is higher than normal grade column, or if the normal grade column is blank.", value=True)
+
 warning_placeholder = st.empty()
 
 if not fn and not ars_fn:
@@ -39,7 +42,7 @@ else:
     grades_df = pd.read_csv(fn, encoding='latin1')
     ars_df = pd.read_excel(ars_fn)
 
-    ars_pid_col = "PID"
+    ars_pid_col = ars_df["PID"]
     sum_columns = []
     for c in grades_df.columns:
         try:
@@ -78,7 +81,7 @@ else:
 
     ars_idx = []
     for idx, v in enumerate(grades_df["SIS User ID"]):
-        if str(v).lower() != 'nan' and str(int(v)) in ars_pid_col:
+        if str(v).lower() != 'nan' and int(v) in list(ars_pid_col):
             ars_idx.append(idx)
 
     sums_df = grades_df[sum_columns]
@@ -86,12 +89,12 @@ else:
     for idx, row in sums_df.iterrows():
         row_keys = list(row.keys())
 
-        if idx in ars_idx:
+        if idx in ars_idx or ars_to_normal_override:
             for ars_index in ars_indices:
-                if str(row[row_keys[ars_index - 1]]).lower() in ['', "nan"]:
+                if str(row[row_keys[ars_index - 1]]).lower().strip() in ['', "nan",]:
                     row[row_keys[ars_index - 1]] = 0
 
-                if str(row[row_keys[ars_index]]).lower() in ['', "nan"]:
+                if str(row[row_keys[ars_index]]).lower().strip() in ['', "nan"]:
                     row[row_keys[ars_index]] = 0
 
                 if row[row_keys[ars_index]] > row[row_keys[ars_index - 1]]:
@@ -99,6 +102,8 @@ else:
 
         row = {k: row[k] for k in row_keys if "ars" not in k.lower()}
         sums_row_list.append(row)
+
+
 
     sums_df = pd.DataFrame.from_dict(sums_row_list)
     sums_df['Total Points'] = sums_df.sum(axis=1)
