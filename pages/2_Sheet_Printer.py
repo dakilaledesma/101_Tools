@@ -21,39 +21,31 @@ os.makedirs("grade_sheets")
 st.subheader("Upload your Canvas CSV file")
 fn = st.file_uploader("Upload your Canvas .CSV file", type=["csv"], accept_multiple_files=False, label_visibility="collapsed")
 
-st.subheader("Upload your ARS XLSX file")
-ars_fn = st.file_uploader("Upload your ARS .XLSX file", type=["xlsx"], accept_multiple_files=False, label_visibility="collapsed")
-
-st.subheader("Options")
-ars_to_blank = st.checkbox("Override ARS grades to the normal grade column if the normal grade column is blank.", value=True)
+ars_to_blank = True
 
 warning_placeholder = st.empty()
 
-if not fn and not ars_fn:
-    warning_placeholder.empty()
-    warning_placeholder.warning("Please upload both your Canvas and ARS files above.")
-elif not ars_fn:
-    warning_placeholder.empty()
-    warning_placeholder.warning("Please upload your ARS file above.")
-elif not fn:
+if not fn:
     warning_placeholder.empty()
     warning_placeholder.warning("Please upload your Canvas file above.")
 else:
     grades_df = pd.read_csv(fn, encoding='latin1')
-    ars_df = pd.read_excel(ars_fn)
 
-    ars_pid_col = ars_df["PID"]
     sum_columns = []
     for c in grades_df.columns:
         try:
-            points_possible = float(grades_df[c][0])
+            points_possible = float(grades_df[c][1])
         except ValueError:
             continue
 
         if all([points_possible != float('nan'),
                 points_possible != np.nan,
-                str(points_possible) != 'nan']):
+                str(points_possible) != 'nan',
+                "roll call" not in c.lower()]
+                ):
             sum_columns.append(c)
+
+    print(sum_columns)
 
     cleaned_grades_list = []
     for _, row in grades_df.iterrows():
@@ -75,21 +67,13 @@ else:
     sum_indices = [[i, c] for i, c in enumerate(sum_columns)]
     ars_indices = []
 
-    for i, c in sum_indices:
-        if "ars" in c.lower():
-            ars_indices.append(i)
-
-    ars_idx = []
-    for idx, v in enumerate(grades_df["SIS User ID"]):
-        if str(v).lower() != 'nan' and int(v) in list(ars_pid_col):
-            ars_idx.append(idx)
 
     sums_df = grades_df[sum_columns]
     sums_row_list = []
     for idx, row in sums_df.iterrows():
         row_keys = list(row.keys())
 
-        if idx in ars_idx or ars_to_blank:
+        if ars_to_blank:
             for ars_index in ars_indices:
                 if str(row[row_keys[ars_index - 1]]).lower().strip() in ['', "nan",]:
                     row[row_keys[ars_index - 1]] = 0

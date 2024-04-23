@@ -13,10 +13,26 @@ if canvas_grade_file is not None:
     canvas_df = pd.read_csv(canvas_grade_file)
 
     grading_cols = []
+    first_col = canvas_df.columns[0]
+    points_possible_row = None
+    for idx, row_value in enumerate(canvas_df[first_col]):
+        row_value = str(row_value)
+        if all([
+            type(row_value) == str,
+            "points" in row_value.lower(),
+            "possible" in row_value.lower() 
+        ]):
+            points_possible_row = idx
+            break
+
     for col in canvas_df.columns:
-        if all([type(canvas_df[col][0]) != str,
-                canvas_df[col][0] != np.nan,
-                str(canvas_df[col][0]) != "nan",
+        if str(canvas_df[col][points_possible_row]).isnumeric():
+            canvas_df[col] = pd.to_numeric(canvas_df[col], errors='coerce')
+
+    for col in canvas_df.columns:
+        if all([type(canvas_df[col][points_possible_row]) != str,
+                canvas_df[col][points_possible_row] != np.nan,
+                str(canvas_df[col][points_possible_row]) != "nan",
                 "roll call" not in col.lower()]):
             grading_cols.append(col)
 
@@ -25,6 +41,7 @@ if canvas_grade_file is not None:
     sums = []
     for _, row in canvas_grade_df.iterrows():
         sums.append(row.sum())
+        print(row.sum())
 
     canvas_grade_df["sum"] = sums
     canvas_grade_df["PID"] = canvas_df["SIS User ID"]
@@ -33,7 +50,6 @@ if canvas_grade_file is not None:
     canvas_grade_df = canvas_grade_df[canvas_grade_df["PID"].notna()]
     canvas_grade_df = canvas_grade_df[~canvas_grade_df['Section'].str.contains(',', na=False)]
     canvas_grade_df = canvas_grade_df.sort_values(by=['Section'])
-
 
     sections = canvas_grade_df["Section"].unique()
 
@@ -56,7 +72,7 @@ if canvas_grade_file is not None:
         counts = {}
         for grade, (lower, upper) in grade_ranges.items():
             counts[grade] = df[(df["sum"] >= lower) & (df["sum"] < upper)].shape[0]
-            print(df[(df["sum"] >= lower) & (df["sum"] < upper)].shape)
+            # print(df[(df["sum"] >= lower) & (df["sum"] < upper)].shape)
         return counts
 
 
@@ -107,7 +123,7 @@ if canvas_grade_file is not None:
         axs[row, col].set_ylabel("Number of Students")
         axs[row, col].set_ylim([0, max_count])  # Set y-axis limit
     # Hide any unused subplots:
-    print(len(sections) + 1, int(n_rows * n_cols))
+    # print(len(sections) + 1, int(n_rows * n_cols))
     for idx in range(len(sections) + 1, int(n_rows * n_cols)):
         row, col = divmod(idx, n_cols)
         axs[row, col].axis('off')
