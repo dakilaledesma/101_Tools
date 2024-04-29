@@ -122,9 +122,9 @@ else:
                 row_dict[c] = ''
             else:
                 if int(row[c]) == float(row[c]):
-                    row_dict[c] = str(row[c]).replace('.0', '')
+                    row_dict[c] = str(round(row[c], 2)).replace('.0', '')
                 else:
-                    row_dict[c] = str(row[c])
+                    row_dict[c] = str(round(row[c], 2))
 
         sums_str_list.append(row_dict)
     sums_df = pd.DataFrame.from_dict(sums_str_list)
