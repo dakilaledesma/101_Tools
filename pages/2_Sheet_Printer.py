@@ -121,7 +121,10 @@ else:
             if str(row[c]).lower() == 'nan':
                 row_dict[c] = ''
             else:
-                row_dict[c] = str(row[c]).replace('.0', '')
+                if int(row[c]) == float(row[c]):
+                    row_dict[c] = str(row[c]).replace('.0', '')
+                else:
+                    row_dict[c] = str(row[c])
 
         sums_str_list.append(row_dict)
     sums_df = pd.DataFrame.from_dict(sums_str_list)
